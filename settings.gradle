@@ -1,2 +1,2 @@
-include ':app', ':AlipayQrScan'
-project(':AlipayQrScan').projectDir = new File('libs/AlipayQrScan')
+include ':app', ':QR_CodeScan'
+project(':QR_CodeScan').projectDir = new File('libs/QR_CodeScan')

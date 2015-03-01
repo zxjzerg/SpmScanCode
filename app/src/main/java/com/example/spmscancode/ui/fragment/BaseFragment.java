@@ -2,6 +2,7 @@ package com.example.spmscancode.ui.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -16,11 +17,13 @@ import android.view.ViewGroup;
 public abstract class BaseFragment extends Fragment {
 
     protected final String TAG = this.getClass().getSimpleName();
+    protected Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate. " + (getActivity() == null ? "Activity is null." : "Activity is not null."));
         super.onCreate(savedInstanceState);
+        mContext = getActivity();
     }
 
     @Nullable
