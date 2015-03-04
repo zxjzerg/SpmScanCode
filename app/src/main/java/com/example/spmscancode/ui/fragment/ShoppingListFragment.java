@@ -105,6 +105,7 @@ public class ShoppingListFragment extends BaseFragment {
                 break;
             case R.id.btn_pay:
                 Log.d(TAG, "pay click");
+
                 break;
             default:
                 break;
