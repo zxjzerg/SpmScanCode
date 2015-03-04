@@ -11,14 +11,22 @@
         android:text="@string/current_total"
         android:textColor="@android:color/black"
         android:textSize="22sp"
+        android:background="#c0cbcf"
         android:textStyle="bold" />
+
+    <include
+        android:id="@+id/view_head"
+        layout="@layout/view_item_list_head"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@+id/tv_total" />
 
     <ListView
         android:id="@+id/lv_shopping_list"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_above="@+id/llyt_btns"
-        android:layout_below="@+id/tv_total"
+        android:layout_below="@+id/view_head"
         android:divider="@android:color/white"
         android:dividerHeight="1dp" />
 

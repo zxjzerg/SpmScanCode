@@ -4,6 +4,6 @@
     <string name="app_name">SpmScanCode</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="current_total">当前总价：%1$d元</string>
+    <string name="current_total">当前总价：%1$s 元</string>
 
 </resources>

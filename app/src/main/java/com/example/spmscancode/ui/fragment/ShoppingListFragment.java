@@ -11,22 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.qr_codescan.MipcaActivityCapture;
 import com.example.spmscancode.Data;
 import com.example.spmscancode.R;
-import com.example.spmscancode.model.Item;
+import com.example.spmscancode.model.ModelContext;
 import com.example.spmscancode.model.Order;
 import com.example.spmscancode.model.OrderItem;
 import com.example.spmscancode.ui.activity.MainActivity;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.spmscancode.ui.activity.PayActivity;
+import com.example.spmscancode.ui.adapter.ItemAdapter;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -39,6 +37,7 @@ import butterknife.OnClick;
 public class ShoppingListFragment extends BaseFragment {
 
     private static final int REQUEST_SCAN = 1;
+    private static final int REQUEST_PAY = 2;
 
     @InjectView(R.id.btn_scan)
     Button mBtnScan;
@@ -49,8 +48,11 @@ public class ShoppingListFragment extends BaseFragment {
     @InjectView(R.id.lv_shopping_list)
     ListView mLvShoppingList;
 
+    @InjectView(R.id.tv_total)
+    TextView mTvTotal;
+
     private Order mCurrentOrder;
-    private ShoppingListAdapter mAdapter;
+    private ItemAdapter mAdapter;
 
     @Nullable
     @Override
@@ -59,6 +61,7 @@ public class ShoppingListFragment extends BaseFragment {
         ButterKnife.inject(this, view);
 
         MainActivity.mTitleBar.clearButtons();
+        MainActivity.mTitleBar.setTitle("购物清单");
         MainActivity.mTitleBar.addRightButton(R.drawable.icon_title_bar_add);
         MainActivity.mTitleBar.setRightBtnClickListener(new View.OnClickListener() {
             @Override
@@ -68,18 +71,20 @@ public class ShoppingListFragment extends BaseFragment {
         });
 
         mCurrentOrder = new Order();
-        mAdapter = new ShoppingListAdapter();
+
+        mAdapter = new ItemAdapter(mContext, mCurrentOrder);
         mLvShoppingList.setAdapter(mAdapter);
-        mLvShoppingList.addHeaderView(createHeaderView());
         mLvShoppingList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                AlertDialog delete = new AlertDialog.Builder(mContext,AlertDialog.THEME_HOLO_LIGHT).create();
-                delete.setMessage("确定删除？");
+            public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
+                AlertDialog delete = new AlertDialog.Builder(mContext, AlertDialog.THEME_HOLO_LIGHT).create();
+                delete.setMessage("删除？");
                 delete.setButton(AlertDialog.BUTTON_POSITIVE, "确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        OrderItem orderItem = ((ItemAdapter) parent.getAdapter()).getItem(position);
+                        mCurrentOrder.removeOrderItem(orderItem);
+                        refresh();
                     }
                 });
                 delete.setButton(AlertDialog.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
@@ -92,6 +97,7 @@ public class ShoppingListFragment extends BaseFragment {
                 return true;
             }
         });
+        refresh();
         return view;
     }
 
@@ -105,22 +111,14 @@ public class ShoppingListFragment extends BaseFragment {
                 break;
             case R.id.btn_pay:
                 Log.d(TAG, "pay click");
-
+                ModelContext.getInstance().setCurrentOrder(mCurrentOrder);
+                Intent intentPay = new Intent(mContext, PayActivity.class);
+                intentPay.putExtra("qr_code", String.valueOf(mCurrentOrder.getId()));
+                startActivityForResult(intentPay, REQUEST_PAY);
                 break;
             default:
                 break;
         }
-    }
-
-    private View createHeaderView() {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.item_shopping_list, mLvShoppingList, false);
-        ((TextView) view.findViewById(R.id.tv_id)).setText("NO.");
-        ((TextView) view.findViewById(R.id.tv_name)).setText("名称");
-        ((TextView) view.findViewById(R.id.tv_price)).setText("单价");
-        ((TextView) view.findViewById(R.id.tv_count)).setText("数量");
-        ((TextView) view.findViewById(R.id.tv_total)).setText("总价");
-        view.setBackgroundColor(getResources().getColor(R.color.gray));
-        return view;
     }
 
     @Override
@@ -131,6 +129,12 @@ public class ShoppingListFragment extends BaseFragment {
                 String code = data.getStringExtra("result");
                 Log.d(TAG, "result: " + code);
                 addItem(code);
+            }
+        } else if (requestCode == REQUEST_PAY) {
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(mContext, "完成支付", Toast.LENGTH_SHORT).show();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(mContext, "取消支付", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -143,8 +147,7 @@ public class ShoppingListFragment extends BaseFragment {
                 if (code.equals(String.valueOf(orderItem.getItem().getCode()))) {
                     orderItem.setCount(orderItem.getCount() + 1);
                     orderItem.calculate();
-                    mCurrentOrder.caculate();
-                    mAdapter.notifyDataSetChanged();
+                    refresh();
                     return;
                 }
             }
@@ -155,90 +158,13 @@ public class ShoppingListFragment extends BaseFragment {
         orderItem.setCount(1);
         orderItem.calculate();
         mCurrentOrder.addOrderItem(orderItem);
-        mCurrentOrder.caculate();
+        refresh();
+    }
+
+    private void refresh() {
+        mCurrentOrder.calculate();
+        mTvTotal.setText(String.format(getString(R.string.current_total), mCurrentOrder.getTotal().toString()));
         mAdapter.notifyDataSetChanged();
     }
 
-    class ShoppingListAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return mCurrentOrder.getOrderItems().size();
-        }
-
-        @Override
-        public OrderItem getItem(int position) {
-            return mCurrentOrder.getOrderItems().get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-
-            if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.item_shopping_list, parent, false);
-                holder = new ViewHolder();
-                holder.tvId = (TextView) convertView.findViewById(R.id.tv_id);
-                holder.tvName = (TextView) convertView.findViewById(R.id.tv_name);
-                holder.tvPrice = (TextView) convertView.findViewById(R.id.tv_price);
-                holder.tvCount = (TextView) convertView.findViewById(R.id.tv_count);
-                holder.tvTotal = (TextView) convertView.findViewById(R.id.tv_total);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            if (position % 2 == 0) {
-                convertView.setBackgroundColor(getResources().getColor(R.color.light_gray));
-            } else {
-                convertView.setBackgroundColor(getResources().getColor(R.color.gray));
-            }
-
-            OrderItem orderItem = getItem(position);
-            holder.tvId.setText(String.valueOf(position + 1));
-            holder.tvName.setText(orderItem.getItem().getName());
-            holder.tvCount.setText(String.valueOf(orderItem.getCount()));
-            holder.tvPrice.setText(orderItem.getItem().getPrice().toString());
-            holder.tvTotal.setText(orderItem.getTotal().toString());
-
-            return convertView;
-        }
-
-        class ViewHolder {
-
-            TextView tvId;
-            TextView tvName;
-            TextView tvPrice;
-            TextView tvCount;
-            TextView tvTotal;
-        }
-    }
-
-    private Order prepareTestData() {
-        Order order = new Order();
-
-        Item coke = new Item(1, "10000001", "可乐", new BigDecimal(2.5));
-        OrderItem orderItem_1 = new OrderItem();
-        orderItem_1.setItem(coke);
-        orderItem_1.setCount(1);
-        orderItem_1.calculate();
-
-        Item chocolate = new Item(2, "10000003", "巧克力", new BigDecimal(6));
-        OrderItem orderItem_2 = new OrderItem();
-        orderItem_2.setItem(chocolate);
-        orderItem_2.setCount(10);
-        orderItem_2.calculate();
-
-        List<OrderItem> orderItems = new ArrayList<OrderItem>();
-        orderItems.add(orderItem_1);
-        orderItems.add(orderItem_2);
-        order.setOrderItems(orderItems);
-
-        return order;
-    }
 }

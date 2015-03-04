@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.example.spmscancode.ui.view.PlatoTitleBar
+        android:id="@+id/view_title"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:background="@color/blue"
+        app:rightBtnText=""
+        app:titleText="结算" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="190dp"
+        android:background="#303d4d"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/iv_qr_code"
+            android:layout_width="135dp"
+            android:layout_height="135dp"
+            android:layout_marginTop="25dp"
+            android:background="@android:color/white"
+            android:scaleType="fitXY" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="扫描二维码完成付款"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_total"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#c0cbcf"
+        android:gravity="center"
+        android:text="@string/current_total"
+        android:textColor="@android:color/black"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <include layout="@layout/view_item_list_head" />
+
+    <ListView
+        android:id="@+id/lv_item_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/white"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>

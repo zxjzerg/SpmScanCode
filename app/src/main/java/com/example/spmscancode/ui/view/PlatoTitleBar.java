@@ -74,18 +74,18 @@ public class PlatoTitleBar extends RelativeLayout {
             addRightButton(mRightBtnText);
         }
 
-        if (!TextUtils.isEmpty(mTitle)) {
-            mTvTitle = new TextView(getContext());
-            LayoutParams titleParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            titleParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-            if (!isInEditMode()) {
-                mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.title_text_size));
-                mTvTitle.setTextColor(getResources().getColor(android.R.color.white));
-            }
-            mTvTitle.setLayoutParams(titleParams);
-            mTvTitle.setText(mTitle);
-            addView(mTvTitle);
+        mTvTitle = new TextView(getContext());
+        LayoutParams titleParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        titleParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        if (!isInEditMode()) {
+            mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.title_text_size));
+            mTvTitle.setTextColor(getResources().getColor(android.R.color.white));
         }
+        mTvTitle.setLayoutParams(titleParams);
+        if (!TextUtils.isEmpty(mTitle)) {
+            mTvTitle.setText(mTitle);
+        }
+        addView(mTvTitle);
 
     }
 
@@ -161,7 +161,7 @@ public class PlatoTitleBar extends RelativeLayout {
             mBtnRight.setPadding(0, 0, 20, 0);
             mBtnRight.setLayoutParams(mRightBtnParams);
             mBtnRight.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-            ((Button) mBtnRight).setTextSize(21);
+            ((Button) mBtnRight).setTextSize(15);
             ((Button) mBtnRight).setTextColor(getResources().getColorStateList(android.R.color.white));
             addView(mBtnRight);
         }
@@ -174,7 +174,7 @@ public class PlatoTitleBar extends RelativeLayout {
     public void addRightButton(int iconId) {
         if (mBtnRight == null) {
             mBtnRight = new ImageView(getContext());
-            mBtnRight.setPadding(50, 0, 20, 0);
+            mBtnRight.setPadding(50, 0, 50, 0);
             mBtnRight.setLayoutParams(mRightBtnParams);
             addView(mBtnRight);
         }

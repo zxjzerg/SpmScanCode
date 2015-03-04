@@ -13,9 +13,12 @@ public class Order {
     private int id;
     private List<OrderItem> orderItems;
     private BigDecimal total;
+    private static int sOrderId = 1000000;
 
     public Order() {
         orderItems = new ArrayList<OrderItem>();
+        total = BigDecimal.ZERO;
+        id = sOrderId += 1;
     }
 
     public int getId() {
@@ -42,14 +45,20 @@ public class Order {
         this.total = total;
     }
 
-    public void caculate() {
-        total = new BigDecimal(0);
-        for (OrderItem item : orderItems) {
-            total = total.add(item.getTotal());
+    public void calculate() {
+        total = BigDecimal.ZERO;
+        if (orderItems.size() > 0) {
+            for (OrderItem item : orderItems) {
+                total = total.add(item.getTotal());
+            }
         }
     }
 
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
+    }
+
+    public void removeOrderItem(OrderItem orderItem) {
+        orderItems.remove(orderItem);
     }
 }

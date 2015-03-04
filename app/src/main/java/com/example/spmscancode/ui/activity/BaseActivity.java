@@ -1,6 +1,7 @@
 package com.example.spmscancode.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
@@ -11,6 +12,7 @@ import android.os.PersistableBundle;
 public class BaseActivity extends Activity {
 
     protected final String TAG = this.getClass().getSimpleName();
+    protected Context mContext = BaseActivity.this;
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
